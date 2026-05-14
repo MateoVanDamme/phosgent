@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>gent-in-licht — sun sweep</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body { padding: 2rem 1rem; }
+        #preview {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        code { word-break: break-all; }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid" style="max-width: 1400px;">
+        <h1 class="h3 mb-4">gent-in-licht — sun sweep</h1>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h2 class="h5 mb-3">Sun</h2>
+
+                        <label for="hour" class="form-label d-flex justify-content-between">
+                            <span>Hour of day (24h)</span><span id="hourLabel">12.0</span>
+                        </label>
+                        <input class="form-range" id="hour" type="range" min="0" max="24" step="0.1" value="12" />
+
+                        <label for="sunWidth" class="form-label d-flex justify-content-between mt-2">
+                            <span>Width (sigma, in LEDs)</span><span id="sunWidthLabel">2.0</span>
+                        </label>
+                        <input class="form-range" id="sunWidth" type="range" min="0.0" max="4" step="0.1" value="2" />
+
+                        <label for="ambient" class="form-label d-flex justify-content-between mt-2">
+                            <span>Ambient sky brightness</span><span id="ambientLabel">0</span>
+                        </label>
+                        <input class="form-range" id="ambient" type="range" min="0" max="255" step="1" value="0" />
+
+                        <hr />
+
+                        <div class="d-flex justify-content-between text-secondary small">
+                            <span>Sun compass angle (90 = E sunrise, 180 = S noon, 270 = W sunset)</span>
+                            <span><code id="sunAngleLabel">180</code>°</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h2 class="h5 mb-3">Animation</h2>
+                        <div class="row g-3 align-items-end">
+                            <div class="col-sm-6">
+                                <label for="duration" class="form-label">Sweep duration (s, full 0→1→0)</label>
+                                <input class="form-control" id="duration" type="number" min="1" value="20" />
+                            </div>
+                            <div class="col-sm-6 d-grid">
+                                <button id="animateBtn" class="btn btn-success">Start sweep</button>
+                            </div>
+                        </div>
+                        <div class="d-grid mt-3">
+                            <button id="offBtn" class="btn btn-outline-secondary">All off</button>
+                        </div>
+                    </div>
+                </div>
+
+                <details class="card mb-3">
+                    <summary class="card-body py-2 text-secondary small" style="cursor: pointer;">
+                        Connection &amp; LED setup
+                    </summary>
+                    <div class="card-body pt-0">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label for="wledIp" class="form-label">WLED IP / mDNS</label>
+                                <input class="form-control" id="wledIp" value="192.168.129.22" />
+                            </div>
+                            <div class="col-sm-3">
+                                <label for="ledCount" class="form-label">LED count</label>
+                                <input class="form-control" id="ledCount" type="number" min="1" value="116" />
+                            </div>
+                            <div class="col-sm-3">
+                                <label for="litCount" class="form-label">Lit LEDs</label>
+                                <input class="form-control" id="litCount" type="number" min="1" value="87" />
+                            </div>
+                        </div>
+                        <div class="form-text">LEDs from index <code>litCount</code> to the end (the bottom side) are forced off.</div>
+                    </div>
+                </details>
+
+                <p class="small text-secondary">
+                    Status: <code id="status">idle</code>
+                </p>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="sticky-lg-top" style="top: 1rem;">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="h5 mb-3">Preview (frame shape)</h2>
+                            <canvas id="preview" width="32" height="32"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>
