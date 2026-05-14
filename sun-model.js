@@ -30,14 +30,8 @@ export function sunState(hourValue) {
 }
 
 // Peak brightness curve for the LED right at the sun's direction.
-// Flat full-blast during the whole day so sunset shadows hit just as hard
-// as noon; only fades during the night portion (sun "below horizon").
-//   - θ in [90, 270]  → 1   (sun above horizon, day)
-//   - θ < 90 or > 270 → linear ramp to 0 at midnight
 function sunIntensity(θdeg) {
-    if (θdeg >= 90 && θdeg <= 270) return 1;
-    if (θdeg < 90)  return θdeg / 90;          // approaching sunrise
-    return (360 - θdeg) / 90;                  // after sunset
+    return 1;
 }
 
 // Sky color from compass angle. Night colors don't matter visually because
