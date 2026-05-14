@@ -34,16 +34,15 @@ function sunIntensity(θdeg) {
     return 1;
 }
 
-// Sky color from compass angle. Night colors don't matter visually because
-// the daylight envelope dims those hours to zero anyway.
+// Sky color from compass angle. 
 function skyColor(θdeg) {
+    const θabs = 180 - Math.abs(θdeg - 180);
     // return MIDDAY;
-    const [a, b, c, d] = [120, 150, 210, 240];
-    if (θdeg < a) return MORNING;
-    if (θdeg < b) return lerp(MORNING, MIDDAY,  (θdeg - a) / (b - a));
-    if (θdeg < c) return MIDDAY;
-    if (θdeg < d) return lerp(MIDDAY,  EVENING, (θdeg - c) / (d - c));
-    return EVENING;
+    const [a, b, c] = [60, 90, 160];
+    if (θabs < a) return MORNING;
+    if (θabs < b) return lerp(MORNING, EVENING,  (θabs - a) / (b - a));
+    if (θabs < c) return lerp(EVENING,  MIDDAY, (θabs - b) / (c - b));
+    return MIDDAY;
 }
 
 // Walk the rectangle perimeter from top-left → down left → across bottom →
