@@ -28,6 +28,7 @@ function postState(ip, body) {
 export function sendFrame(ip, colors) {
     return postState(ip, {
         on: true,
+        bri: 255,
         seg: [{ id: 0, i: frameToHex(colors) }],
     });
 }
