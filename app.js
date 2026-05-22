@@ -1,5 +1,6 @@
 import { buildFrame, sunState } from './sun-model.js';
 import { sendFrame, turnOff } from './wled.js';
+import { getSunPosition, getCloudCover } from './ghent-live.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -18,6 +19,10 @@ const labels = {
     ambient:  $('ambientLabel'),
     sunAngle: $('sunAngleLabel'),
 };
+
+const liveAzimuth  = $('liveAzimuth');
+const liveAltitude = $('liveAltitude');
+const liveCloud    = $('liveCloud');
 
 let inFlight = false;
 let pendingSend = false;
@@ -134,3 +139,21 @@ $('offBtn').addEventListener('click', () => {
 });
 
 refresh();
+
+function refreshLiveSun() {
+    const { compassDeg, altitudeDeg } = getSunPosition();
+    liveAzimuth.textContent  = compassDeg.toFixed(1) + '°';
+    liveAltitude.textContent = altitudeDeg.toFixed(1) + '°';
+}
+
+function refreshLiveCloud() {
+    liveCloud.textContent = '…';
+    getCloudCover()
+        .then(cov => { liveCloud.textContent = cov + '%'; })
+        .catch(err => { liveCloud.textContent = 'err: ' + err.message; });
+}
+
+refreshLiveSun();
+refreshLiveCloud();
+setInterval(refreshLiveSun,   10 * 1000);
+setInterval(refreshLiveCloud, 15 * 60 * 1000);

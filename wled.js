@@ -25,11 +25,25 @@ function postState(ip, body) {
     });
 }
 
+// The strip is wound the opposite way around the physical model from how the
+// renderer lays LEDs out (clockwise compass bearings), so reverse before send.
+const STRIP_REVERSED = true;
+
+// Rotational offset (in LEDs) applied after reversal, to align the strip's
+// physical "top" with the renderer's "north". Tune visually: nudge until the
+// midnight train (hour 0) sits at the top of the model.
+const STRIP_OFFSET = 29;
+
 export function sendFrame(ip, colors) {
+    let ordered = STRIP_REVERSED ? [...colors].reverse() : [...colors];
+    if (STRIP_OFFSET !== 0) {
+        const k = ((STRIP_OFFSET % ordered.length) + ordered.length) % ordered.length;
+        ordered = ordered.slice(k).concat(ordered.slice(0, k));
+    }
     return postState(ip, {
         on: true,
         bri: 255,
-        seg: [{ id: 0, i: frameToHex(colors) }],
+        seg: [{ id: 0, i: frameToHex(ordered) }],
     });
 }
 
