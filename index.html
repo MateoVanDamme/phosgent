@@ -36,9 +36,9 @@
                         <input class="form-range" id="hour" type="range" min="0" max="24" step="0.1" value="12" />
 
                         <label for="sunWidth" class="form-label d-flex justify-content-between mt-2">
-                            <span>Width (sigma, in LEDs)</span><span id="sunWidthLabel">2.0</span>
+                            <span>Width (LEDs)</span><span id="sunWidthLabel">3</span>
                         </label>
-                        <input class="form-range" id="sunWidth" type="range" min="0.0" max="4" step="0.1" value="2" />
+                        <input class="form-range" id="sunWidth" type="range" min="1" max="15" step="1" value="3" />
 
                         <label for="ambient" class="form-label d-flex justify-content-between mt-2">
                             <span>Ambient sky brightness</span><span id="ambientLabel">0</span>
@@ -57,17 +57,7 @@
 
                 <div class="card mb-3">
                     <div class="card-body">
-                        <h2 class="h5 mb-3">Animation</h2>
-                        <div class="row g-3 align-items-end">
-                            <div class="col-sm-6">
-                                <label for="duration" class="form-label">Sweep duration (s, full 0→1→0)</label>
-                                <input class="form-control" id="duration" type="number" min="1" value="20" />
-                            </div>
-                            <div class="col-sm-6 d-grid">
-                                <button id="animateBtn" class="btn btn-success">Start sweep</button>
-                            </div>
-                        </div>
-                        <div class="d-grid mt-3">
+                        <div class="d-grid">
                             <button id="offBtn" class="btn btn-outline-secondary">All off</button>
                         </div>
                     </div>

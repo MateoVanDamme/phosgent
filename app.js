@@ -9,7 +9,6 @@ const litCount = $('litCount');
 const hour     = $('hour');
 const sunWidth = $('sunWidth');
 const ambient  = $('ambient');
-const duration = $('duration');
 const preview  = $('preview');
 const statusEl = $('status');
 
@@ -20,7 +19,6 @@ const labels = {
     sunAngle: $('sunAngleLabel'),
 };
 
-let animTimer = null;
 let inFlight = false;
 let pendingSend = false;
 
@@ -30,7 +28,7 @@ function frameParams() {
         W:         preview.width,
         H:         preview.height,
         hourValue: parseFloat(hour.value),
-        sigma:     parseFloat(sunWidth.value),
+        width:     parseInt(sunWidth.value, 10),
         ambient:   parseInt(ambient.value, 10),
     };
 }
@@ -107,7 +105,7 @@ function sendCurrent() {
 
 function updateLabels() {
     labels.hour.textContent     = (+hour.value).toFixed(1);
-    labels.sunWidth.textContent = (+sunWidth.value).toFixed(1);
+    labels.sunWidth.textContent = sunWidth.value;
     labels.ambient.textContent  = ambient.value;
     labels.sunAngle.textContent = Math.round(sunState(parseFloat(hour.value)).θdeg);
 }
@@ -122,40 +120,12 @@ function refreshAndSend() {
     sendCurrent();
 }
 
-function stopAnim() {
-    if (!animTimer) return;
-    clearInterval(animTimer);
-    animTimer = null;
-    $('animateBtn').textContent = 'Start sweep';
-    $('animateBtn').classList.replace('btn-danger', 'btn-success');
-}
-
-function startAnim() {
-    const dur = Math.max(1, parseFloat(duration.value)) * 1000;
-    const fps = 15;
-    const tick = 1000 / fps;
-    const start = performance.now();
-    animTimer = setInterval(() => {
-        const t = ((performance.now() - start) % dur) / dur; // 0..1
-        hour.value = (t * 24).toFixed(2);
-        refresh();
-        sendCurrent();
-    }, tick);
-    $('animateBtn').textContent = 'Stop sweep';
-    $('animateBtn').classList.replace('btn-success', 'btn-danger');
-}
-
 ['input', 'change'].forEach(ev => {
     [hour, sunWidth, ambient, ledCount, litCount]
         .forEach(el => el.addEventListener(ev, refreshAndSend));
 });
 
-$('animateBtn').addEventListener('click', () => {
-    if (animTimer) stopAnim(); else startAnim();
-});
-
 $('offBtn').addEventListener('click', () => {
-    stopAnim();
     const ip = wledIp.value.trim();
     if (!ip) return;
     turnOff(ip)

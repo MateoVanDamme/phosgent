@@ -68,9 +68,9 @@ function compassFromCenter(x, y, cx, cy) {
 //   n         — LED count
 //   W, H      — canvas pixel size used to lay LEDs around the perimeter
 //   hourValue — 0..24
-//   sigma     — sun spread, in LEDs
-//   ambient   — 0..255 ambient sky brightness
-export function buildFrame({ n, W, H, hourValue, sigma, ambient }) {
+//   width     — number of LEDs lit in the sun "train"
+//   ambient   — 0..255 ambient sky brightness for the rest of the ring
+export function buildFrame({ n, W, H, hourValue, width, ambient }) {
     const cx = (W - 1) / 2;
     const cy = (H - 1) / 2;
     const sunR = Math.min(W, H) / 2 * SUN_RADIUS_FACTOR;
@@ -79,19 +79,27 @@ export function buildFrame({ n, W, H, hourValue, sigma, ambient }) {
     const sunX = cx + sunR * sun.sinθ;
     const sunY = cy - sunR * sun.cosθ;
 
-    // Convert sigma from LEDs along the strip to angular degrees of bearing.
-    const sigmaDeg = Math.max(0.5, sigma) * (360 / n);
-    const [sr, sg, sb] = skyColor(sun.θdeg);
-
-    const colors = new Array(n);
+    // Find the LED whose bearing from center is closest to the sun's bearing.
+    let sunLed = 0;
+    let minΔ = Infinity;
     for (let i = 0; i < n; i++) {
         const [xL, yL] = ledPos(i, n, W, H);
         const θled = compassFromCenter(xL, yL, cx, cy);
         let Δ = Math.abs(θled - sun.θdeg);
         if (Δ > 180) Δ = 360 - Δ;
-        const fall = Math.exp(-(Δ * Δ) / (2 * sigmaDeg * sigmaDeg));
-        const t = Math.min(1, (ambient + SUN_PEAK * fall) / 255) * sun.intensity;
-        colors[i] = [sr * t, sg * t, sb * t];
+        if (Δ < minΔ) { minΔ = Δ; sunLed = i; }
+    }
+
+    // Train of `width` contiguous LEDs centered on sunLed, wrapping the ring.
+    const start = ((sunLed - Math.floor((width - 1) / 2)) % n + n) % n;
+    const [sr, sg, sb] = skyColor(sun.θdeg);
+    const amb = ambient / 255;
+    const dim = [sr * amb, sg * amb, sb * amb];
+
+    const colors = new Array(n);
+    for (let i = 0; i < n; i++) {
+        const offset = ((i - start) % n + n) % n;
+        colors[i] = offset < width ? [sr, sg, sb] : dim;
     }
     return { colors, sunX, sunY };
 }
